@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mood Playlist</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Mood Playlist <i class="fa-solid fa-music"></i></h1>
+
+    <div class="mood-toolbar">
+      <button class="mood-btn" data-mood="Happy"><i class="fa-solid fa-face-smile"></i> Happy</button>
+      <button class="mood-btn" data-mood="Sad"><i class="fa-solid fa-face-frown"></i> Sad</button>
+      <button class="mood-btn" data-mood="Chill"><i class="fa-solid fa-face-meh"></i> Chill</button>
+      <button class="mood-btn" data-mood="Energetic"><i class="fa-solid fa-bolt"></i> Energetic</button>
+    </div>
+
+    <div class="manual-input">
+      <input type="text" id="moodInput" placeholder="Or type your mood...">
+      <button id="generateBtn"><i class="fa-solid fa-play"></i> Generate Playlist</button>
+    </div>
+
+    <h2>Recommendations:</h2>
+    <div id="playlist" class="playlist"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC4ueOFJQMD6yjLr4pIqp17eeUspnHrg10",
+      authDomain: "mood-playlist-33e8a.firebaseapp.com",
+      projectId: "mood-playlist-33e8a",
+      storageBucket: "mood-playlist-33e8a.firebasestorage.app",
+      messagingSenderId: "601030766214",
+      appId: "1:601030766214:web:9b9e82a7a89e08ecba2b07",
+      measurementId: "G-XQN3MCQ4GR"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const moodSongs = {
+      Happy: [
+        {title:"Happy Song 1", artist:"Artist A", icon:"🎵"},
+        {title:"Happy Song 2", artist:"Artist B", icon:"🎶"}
+      ],
+      Sad: [
+        {title:"Sad Song 1", artist:"Artist C", icon:"💧"},
+        {title:"Sad Song 2", artist:"Artist D", icon:"🎼"}
+      ],
+      Chill: [
+        {title:"Chill Song 1", artist:"Artist E", icon:"☕"},
+        {title:"Chill Song 2", artist:"Artist F", icon:"🛋️"}
+      ],
+      Energetic: [
+        {title:"Energetic Song 1", artist:"Artist G", icon:"⚡"},
+        {title:"Energetic Song 2", artist:"Artist H", icon:"🔥"}
+      ]
+    };
+
+    const playlistDiv = document.getElementById("playlist");
+    const input = document.getElementById("moodInput");
+
+    async function savePlaylist(mood, title, artist) {
+      try {
+        await addDoc(collection(db, "playlists"), {
+          mood: mood,
+          title: title,
+          artist: artist,
+          timestamp: serverTimestamp()
+        });
+        console.log("Saved to Firestore");
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    }
+
+    function generatePlaylist(mood) {
+      playlistDiv.innerHTML = "";
+      const songs = moodSongs[mood] || [];
+      songs.forEach(song => {
+        const songEl = document.createElement("p");
+        songEl.innerHTML = `${song.icon} <strong>${song.title}</strong> - ${song.artist}`;
+        songEl.classList.add("song-item");
+        playlistDiv.appendChild(songEl);
+        savePlaylist(mood, song.title, song.artist);
+      });
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      const mood = input.value.trim() || "Happy";
+      generatePlaylist(mood);
+    });
+
+    document.querySelectorAll(".mood-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const mood = btn.dataset.mood;
+        generatePlaylist(mood);
+      });
+    });
+  </script>
+</body>
+</html>
