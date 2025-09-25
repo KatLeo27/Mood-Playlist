@@ -16,5 +16,5 @@ const scopes = [
 export const getSpotifyAuthUrl = () => {
   return `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
     "%20"
-  )}&response_type=token&show_dialog=true`;
+  )}&response_type=code&show_dialog=true`;
 };
