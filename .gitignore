@@ -1,0 +1,20 @@
+# Node / JS
+node_modules/
+dist/
+build/
+.DS_Store
+.vscode/
+
+# Env & secrets
+.env
+.env.local
+.env.*.local
+*.secret
+serviceAccountKey.json
+
+# Firebase / Google
+.firebase/
+.google/
+
+# System
+Thumbs.db
